@@ -8,7 +8,7 @@
 
 [config]
 ssh_conf_path   = "/vagrant/provision/sshconfig/"
-domain_dev      = "{{ VM.developmentDomain }}"
+domain_dev      = "{{ PROVISION.developmentDomain }}"
 
 [db]
 dsn = "{{ CLITOOLS.db.dsn }}"
@@ -18,7 +18,7 @@ debug_log_dir = "/tmp/debug/"
 
 [syscheck]
 enabled = 1
-{% if VM.growlPassword %}
+{% if CLITOOLS.growlPassword %}
 wall = 0
 growl = 1
 {% else %}
@@ -29,7 +29,7 @@ diskusage = 90
 
 [growl]
 server = 192.168.56.1
-password = "{{ VM.growlPassword }}"
+password = "{{ CLITOOLS.growlPassword }}"
 
 [docker]
 container   = main
@@ -38,6 +38,13 @@ boilerplate = "{{ CLITOOLS.docker.boilerplate }}"
 
 climethod = docker-exec
 ; climethod = dockercompose-run
+
+[dockerBoilerplate]
+default = "{{ CLITOOLS.docker.boilerplate }}"
+typo3   = https://github.com/webdevops/TYPO3-docker-boilerplate.git
+
+[banner]
+mailbox = imap-insecure://vagrant:vagrant@127.0.0.1/INBOX
 
 [commands]
 ; not used commands here

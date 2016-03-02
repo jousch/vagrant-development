@@ -2,19 +2,8 @@
   lineinfile:
     dest: '/etc/default/docker'
     regexp: '^#?DOCKER_OPTS\='
-    line: 'DOCKER_OPTS="-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --insecure-registry {{ VM.dockerRegistry }} {{ VM.dockerOpts }}"'
+    line: 'DOCKER_OPTS="-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock {{ DOCKER.opts }}"'
     state: present
-  when: VM.dockerRegistry is defined
-  notify:
-    - Restart Docker
-
-- name: Configure docker
-  lineinfile:
-    dest: '/etc/default/docker'
-    regexp: '^#?DOCKER_OPTS\='
-    line: 'DOCKER_OPTS="-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock {{ VM.dockerOpts }}"'
-    state: present
-  when: VM.dockerRegistry is not defined
   notify:
     - Restart Docker
 
@@ -34,9 +23,8 @@
     delete: no
 
 - name: Install docker-compose
-  shell: "curl -L https://github.com/docker/compose/releases/download/{{ PACKAGES.dockerCompose }}/docker-compose-`uname -s`-`uname -m` > /opt/docker/bin/docker-compose.{{ PACKAGES.dockerCompose }}"
-  args:
-    creates: '/opt/docker/bin/docker-compose.{{ PACKAGES.dockerCompose }}'
+  pip:
+    name: docker-compose
 
 - name: Fix rights
   file:
@@ -46,7 +34,6 @@
     group: vagrant
     mode: '{{ item.mode }}'
   with_items:
-   - { path: '/opt/docker/bin/docker-compose.{{ PACKAGES.dockerCompose }}', state : 'file', mode: '0777' }
    - { path: '/opt/docker/bin/compose-wrapper.sh', state : 'file', mode: '0777' }
 
 - name: Add symlinks
@@ -59,7 +46,6 @@
     mode: '0777'
     force: yes
   with_items:
-   - { src: '/opt/docker/bin/docker-compose.{{ PACKAGES.dockerCompose }}', dest: '/usr/local/bin/docker-compose' }
    - { src: '/opt/docker/bin/compose-wrapper.sh',   dest: '/usr/local/bin/dcc' }
 
 #############################

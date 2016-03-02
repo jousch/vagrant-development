@@ -1,10 +1,11 @@
-- name: Install apache2 (docker-proxy)
+---
+
+- name: Install monit
   include: install.yml
   tags:
     - bootstrap
 
-- name: Configure apache2 (docker-proxy)
+- name: Configure monit
   include: configuration.yml
   tags:
     - bootstrap
-    - maintenance
